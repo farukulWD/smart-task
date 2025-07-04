@@ -36,20 +36,32 @@ type TaskFormValues = z.infer<typeof formSchema>;
 
 export function TaskForm({ task, onCancel }: TaskFormProps) {
   const { t } = useTranslation();
+  const isEdit = !!task;
+
+  const [tasks, setTasks] = React.useState<Task[]>([]);
+
+  // Load tasks from localStorage safely
+  React.useEffect(() => {
+    const preTasks = localStorage.getItem("smart-tasks");
+    if (preTasks) {
+      try {
+        setTasks(JSON.parse(preTasks));
+      } catch (e) {
+        console.error("Failed to parse tasks from localStorage:", e);
+        setTasks([]);
+      }
+    }
+  }, []);
 
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: task?.title ?? "",
       description: task?.description ?? "",
-      dueDate: task?.dueDate ?? new Date(),
+      dueDate: task?.dueDate ? new Date(task.dueDate) : new Date(),
       status: task?.status ?? "pending",
     },
   });
-
-  const isEdit = !!task;
-  const preTasks = localStorage.getItem("smart-tasks");
-  const tasks: Task[] = preTasks ? JSON.parse(preTasks) : [];
 
   const addTask = (taskData: Omit<Task, "id" | "createdAt">) => {
     const newTask: Task = {
@@ -58,33 +70,39 @@ export function TaskForm({ task, onCancel }: TaskFormProps) {
       createdAt: new Date().toISOString(),
     };
 
-    localStorage.setItem("smart-tasks", JSON.stringify([...tasks, newTask]));
+    const updatedTasks = [...tasks, newTask];
+    localStorage.setItem("smart-tasks", JSON.stringify(updatedTasks));
+    setTasks(updatedTasks);
   };
 
   const updateTask = (taskData: Omit<Task, "id" | "createdAt">) => {
-    if (!isEdit) return;
+    if (!isEdit || !task) return;
 
-    const updatedTask = tasks.map((t) =>
-      t.id === task.id ? { ...t, taskData } : task
+    const updatedTasks = tasks.map((t) =>
+      t.id === task.id ? { ...t, ...taskData } : t
     );
-    localStorage.setItem("smart-tasks", JSON.stringify(updatedTask));
+
+    localStorage.setItem("smart-tasks", JSON.stringify(updatedTasks));
+    setTasks(updatedTasks);
   };
 
   const handleFormSubmit = (values: TaskFormValues) => {
     if (isEdit) {
-      updateTask({ ...values, description: values.description ?? "" });
-      toast.success("Task update success");
+      updateTask({
+        ...values,
+        description: values.description ?? "",
+      });
+      toast.success("Task updated successfully");
     } else {
       addTask({
         ...values,
         description: values.description ?? "",
         dueDate: new Date(values.dueDate),
       });
-      toast.success("Task added success");
+      toast.success("Task added successfully");
     }
 
     form.reset();
-
     onCancel();
   };
 
