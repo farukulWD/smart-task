@@ -12,6 +12,7 @@ import SummaryCard from "./summary-card";
 import { TaskCard } from "./task-card";
 import { Card, CardContent } from "../ui/card";
 import UpdateTaskDialog from "./update-task-dialog";
+import { SubtaskSuggestions } from "./subtask-suggestions";
 
 export default function TaskView() {
   const { t } = useTranslation();
@@ -19,6 +20,7 @@ export default function TaskView() {
   const [onOpenAd, setOnOpenAd] = useState(false);
   const [updateTask, setUpdateTask] = useState<Task>();
   const [isEdit, setIsEdit] = useState<boolean>(false);
+  const [suggestingFor, setSuggestingFor] = useState<string | null>(null);
 
   const loadTasks = () => {
     const saved = localStorage.getItem("smart-tasks");
@@ -59,7 +61,21 @@ export default function TaskView() {
     localStorage.setItem("smart-tasks", JSON.stringify(remainTasks));
     loadTasks();
   };
-  const handleSuggestSubtasks = () => {};
+  const handleSuggestSubtasks = (taskId: string) => {
+    setSuggestingFor(taskId);
+  };
+
+  const addTask = (taskData: Omit<Task, "id" | "createdAt">) => {
+    const newTask: Task = {
+      ...taskData,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+    };
+
+    const updatedTasks = [...(tasks || []), newTask];
+    localStorage.setItem("smart-tasks", JSON.stringify(updatedTasks));
+    setTasks(updatedTasks);
+  };
 
   return (
     <motion.div
@@ -242,6 +258,16 @@ export default function TaskView() {
             )}
           </AnimatePresence>
         )}
+
+        <AnimatePresence>
+          {suggestingFor && tasks && (
+            <SubtaskSuggestions
+              task={tasks.find((item) => item?.id === suggestingFor) as Task}
+              onClose={() => setSuggestingFor(null)}
+              onCreateTask={addTask}
+            />
+          )}
+        </AnimatePresence>
       </div>
     </motion.div>
   );

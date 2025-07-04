@@ -41,7 +41,7 @@ export function TaskForm({ task, onCancel }: TaskFormProps) {
   const [tasks, setTasks] = React.useState<Task[]>([]);
 
   // Load tasks from localStorage safely
-  React.useEffect(() => {
+ React.useEffect(() => {
     const preTasks = localStorage.getItem("smart-tasks");
     if (preTasks) {
       try {
