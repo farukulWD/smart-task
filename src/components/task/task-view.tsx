@@ -83,14 +83,14 @@ export default function TaskView() {
       initial="hidden"
       animate="visible"
     >
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto px-4">
         {/* Header */}
         <motion.div className="text-center mb-8">
           <div className="flex justify-between items-start mb-4">
             <div className="flex-1" />
-            <div className="flex-1 text-center">
+            <div className="md:flex-1 text-center">
               <motion.h1
-                className="text-4xl font-bold text-gray-900 mb-2"
+                className="text-2xl md:text-4xl font-bold text-gray-900 mb-2"
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
