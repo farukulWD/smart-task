@@ -1,24 +1,33 @@
-"use client"
-import { useTranslation } from "@/hooks/use-locale"
-import { Task } from "@/lib/types"
-import {motion} from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import { CheckCircle2, Circle, Edit3, Lightbulb, Trash2 } from "lucide-react"
-import { Button } from "../ui/button"
-import { Badge } from "../ui/badge"
-import { format } from "date-fns"
+"use client";
+import { useTranslation } from "@/hooks/use-locale";
+import { Task } from "@/lib/types";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { CheckCircle2, Circle, Edit3, Lightbulb, Trash2 } from "lucide-react";
+import { Button } from "../ui/button";
+import { Badge } from "../ui/badge";
+import { format } from "date-fns";
 
 interface TaskCardProps {
-  task: Task
-  onToggleStatus: (id: string) => void
-  onEdit: (task: Task) => void
-  onDelete: (id: string) => void
-  onSuggestSubtasks: (id: string) => void
+  task: Task;
+  onToggleStatus: (id: string) => void;
+  onEdit: (task: Task) => void;
+  onDelete: (id: string) => void;
+  onSuggestSubtasks: (id: string) => void;
 }
 
-export function TaskCard ({ task, onToggleStatus, onEdit, onDelete, onSuggestSubtasks }: TaskCardProps) {
-  const { t } = useTranslation()
-  const isOverdue = !!task.dueDate && new Date(task.dueDate) < new Date() && task.status === "pending"
+export function TaskCard({
+  task,
+  onToggleStatus,
+  onEdit,
+  onDelete,
+  onSuggestSubtasks,
+}: TaskCardProps) {
+  const { t } = useTranslation();
+  const isOverdue =
+    !!task.dueDate &&
+    new Date(task.dueDate) < new Date() &&
+    task.status === "pending";
 
   return (
     <motion.div
@@ -29,7 +38,11 @@ export function TaskCard ({ task, onToggleStatus, onEdit, onDelete, onSuggestSub
       whileHover={{ scale: 1.02, y: -2 }}
       transition={{ duration: 0.2 }}
     >
-      <Card className={`transition-all hover:shadow-md ${task.status === "completed" ? "opacity-75" : ""}`}>
+      <Card
+        className={`transition-all hover:shadow-md ${
+          task.status === "completed" ? "opacity-75" : ""
+        }`}
+      >
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex items-start space-x-3 flex-1">
@@ -52,11 +65,23 @@ export function TaskCard ({ task, onToggleStatus, onEdit, onDelete, onSuggestSub
                 )}
               </motion.button>
               <div className="flex-1">
-                <CardTitle className={`text-lg ${task.status === "completed" ? "line-through text-gray-500" : ""}`}>
+                <CardTitle
+                  className={`text-lg ${
+                    task.status === "completed"
+                      ? "line-through text-gray-500"
+                      : ""
+                  }`}
+                >
                   {task.title}
                 </CardTitle>
                 {task.description && (
-                  <p className={`text-sm mt-1 ${task.status === "completed" ? "text-gray-400" : "text-gray-600"}`}>
+                  <p
+                    className={`text-sm mt-1 ${
+                      task.status === "completed"
+                        ? "text-gray-400"
+                        : "text-gray-600"
+                    }`}
+                  >
                     {task.description}
                   </p>
                 )}
@@ -89,16 +114,35 @@ export function TaskCard ({ task, onToggleStatus, onEdit, onDelete, onSuggestSub
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
               >
-                <Badge variant={task.status === "completed" ? "default" : isOverdue ? "destructive" : "secondary"}>
-                  {task.status === "completed" ? t("completed") : isOverdue ? t("overdue") : t("pending")}
+                <Badge
+                  variant={
+                    task.status === "completed"
+                      ? "default"
+                      : isOverdue
+                      ? "destructive"
+                      : "secondary"
+                  }
+                >
+                  {task.status === "completed"
+                    ? t("completed")
+                    : isOverdue
+                    ? t("overdue")
+                    : t("pending")}
                 </Badge>
               </motion.div>
               <span className="text-sm text-gray-500">
-                {t("due", { date: task.dueDate ? format(new Date(task.dueDate), "MMM dd, yyyy") : "No due date" })}
+                {t("due", {
+                  date: task.dueDate
+                    ? format(new Date(task.dueDate), "MMM dd, yyyy")
+                    : "No due date",
+                })}
               </span>
             </div>
             {task.status === "pending" && (
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button
                   variant="outline"
                   size="sm"
@@ -114,5 +158,5 @@ export function TaskCard ({ task, onToggleStatus, onEdit, onDelete, onSuggestSub
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }

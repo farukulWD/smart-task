@@ -11,6 +11,7 @@ import NewTaskDialog from "./new-task-dialog";
 import SummaryCard from "./summary-card";
 import { TaskCard } from "./task-card";
 import { Card, CardContent } from "../ui/card";
+import UpdateTaskDialog from "./update-task-dialog";
 
 export default function TaskView() {
   const { t } = useTranslation();
@@ -36,9 +37,28 @@ export default function TaskView() {
   const pendingTasks = tasks?.filter((task) => task.status === "pending");
   const completedTasks = tasks?.filter((task) => task.status === "completed");
 
-  const deleteTask = () => {};
+  const toggleTaskStatus = (id: string) => {
+    const changeStatus = tasks?.map((task) =>
+      task.id === id
+        ? {
+            ...task,
+            status: task.status === "pending" ? "completed" : "pending",
+          }
+        : task
+    );
 
-  const toggleTaskStatus = () => {};
+    setTasks((changeStatus as Task[]) || []);
+
+    localStorage.setItem("smart-tasks", JSON.stringify(changeStatus));
+    loadTasks();
+  };
+
+  const deleteTask = (id: string) => {
+    const remainTasks = tasks?.filter((task) => task.id !== id);
+    setTasks(remainTasks);
+    localStorage.setItem("smart-tasks", JSON.stringify(remainTasks));
+    loadTasks();
+  };
   const handleSuggestSubtasks = () => {};
 
   return (
@@ -207,6 +227,21 @@ export default function TaskView() {
             />
           )}
         </AnimatePresence>
+        {/* update modal */}
+        {updateTask && (
+          <AnimatePresence>
+            {isEdit && (
+              <UpdateTaskDialog
+                open={isEdit}
+                onOpenChange={(value) => {
+                  setIsEdit(value);
+                  if (!value) loadTasks();
+                }}
+                initialTask={updateTask}
+              />
+            )}
+          </AnimatePresence>
+        )}
       </div>
     </motion.div>
   );
